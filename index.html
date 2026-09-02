@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SENS Installer</title>
+  <script type="module"
+    src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module">
+  </script>
+  <style>
+    body{font-family:Arial,sans-serif;max-width:760px;margin:48px auto;padding:0 20px;line-height:1.5}
+    .box{border:1px solid #ccc;border-radius:14px;padding:28px}
+    h1{margin-top:0}
+    .meta{margin:18px 0 28px}
+    .note{font-size:.92rem;margin-top:24px}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>SENS Installer</h1>
+    <p>Instalação experimental do firmware SENS diretamente pelo navegador.</p>
+    <div class="meta">
+      <strong>Placa:</strong> ESP32 DevKit V1<br>
+      <strong>Firmware:</strong> SENS V2.2.1 RC5B8 REV04B BATCH_50
+    </div>
+    <esp-web-install-button manifest="manifest.json">
+      <button slot="activate">CONECTAR E INSTALAR SENS</button>
+      <span slot="unsupported">
+        Este navegador não oferece o recurso necessário para instalação via USB.
+      </span>
+    </esp-web-install-button>
+    <p class="note">
+      PoC 1 — esta versão testa somente a instalação web. A configuração do
+      equipamento ainda é a configuração compilada no firmware.
+    </p>
+  </div>
+</body>
+</html>
