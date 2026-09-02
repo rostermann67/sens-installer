@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SENS Installer — PoC 2B</title>
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+<style>
+body{font-family:Arial,sans-serif;max-width:820px;margin:42px auto;padding:0 18px;line-height:1.5}
+.card{border:1px solid #ccc;border-radius:14px;padding:26px;margin:20px 0}
+.warn{font-weight:bold}
+button{padding:10px 16px}
+</style>
+</head>
+<body>
+<h1>SENS Installer — PoC 2B</h1>
+<div class="card">
+<h2>RECUPERAR / ATUALIZAR — PRESERVAR DADOS</h2>
+<p>Grava o bloco de seleção de boot em <b>0xE000</b> e a aplicação SENS em <b>0x10000</b>.</p>
+<p>Não grava NVS (0x9000) nem SPIFFS (0x290000).</p>
+<p class="warn">Objetivo: recuperar o New amarelo sem apagar sequência/configuração/buffer persistente.</p>
+<esp-web-install-button manifest="manifest-recover.json">
+<button slot="activate">RECUPERAR SENS — PRESERVAR</button>
+<span slot="unsupported">Navegador sem suporte à instalação USB.</span>
+</esp-web-install-button>
+</div>
+<p>Firmware: SENS V2.2.1 RC5B8 REV04B BATCH_50.</p>
+</body></html>
