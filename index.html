@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SENS Installer — PoC 2</title>
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+<style>
+body{font-family:Arial,sans-serif;max-width:850px;margin:42px auto;padding:0 18px;line-height:1.5}
+.card{border:1px solid #ccc;border-radius:14px;padding:24px;margin:20px 0}
+h1{margin-bottom:4px}.small{font-size:.92rem}.warn{font-weight:bold}
+button{padding:9px 14px}
+</style>
+</head>
+<body>
+<h1>SENS Installer</h1>
+<p>PoC 2 — ESP32 DevKit V1</p>
+
+<div class="card">
+<h2>ATUALIZAR SENS — PRESERVAR DADOS</h2>
+<p>Grava somente a aplicação SENS. Não grava NVS, tabela de partições nem SPIFFS.</p>
+<p class="warn">Objetivo do teste: preservar identidade, sequência e buffer persistente.</p>
+<esp-web-install-button manifest="manifest-update.json">
+<button slot="activate">ATUALIZAR SENS — PRESERVAR</button>
+<span slot="unsupported">Navegador sem suporte à instalação USB.</span>
+</esp-web-install-button>
+</div>
+
+<div class="card">
+<h2>INSTALAR SENS DO ZERO</h2>
+<p>Usa a imagem completa de 4 MB. Pode reinicializar identidade, sequência, buffer e demais dados persistentes.</p>
+<esp-web-install-button manifest="manifest-zero.json">
+<button slot="activate">INSTALAR DO ZERO</button>
+<span slot="unsupported">Navegador sem suporte à instalação USB.</span>
+</esp-web-install-button>
+</div>
+
+<p class="small">Firmware: SENS V2.2.1 RC5B8 REV04B BATCH_50.</p>
+</body></html>
