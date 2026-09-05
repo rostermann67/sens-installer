@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SENS Installer V2.1</title>
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+<style>
+:root{font-family:Arial,sans-serif;color:#172033;background:#f5f7f6}body{max-width:980px;margin:auto;padding:28px 18px 52px}
+header{background:#205514;color:#fff;border-radius:16px;padding:25px 28px;margin-bottom:20px}header h1{margin:0 0 5px;font-size:30px}
+.banner{background:#fff2cc;border-radius:11px;padding:13px 15px;margin:0 0 17px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+.card{background:#fff;border:1px solid #d1d5db;border-radius:16px;padding:24px;box-shadow:0 3px 12px #0000000d}
+.green{border-top:7px solid #38761d}.red{border-top:7px solid #b00000}.wifi{background:#eaf4e6;border-radius:10px;padding:12px 14px;margin:15px 0}
+.warn{background:#fce5cd;border-radius:10px;padding:12px 14px;margin:15px 0}
+button{border:0;border-radius:10px;padding:13px 18px;color:white;font-weight:700;font-size:16px;cursor:pointer}
+.green button{background:#38761d}.red button{background:#b00000}small{display:block;margin-top:10px;color:#667085}
+footer{text-align:center;color:#667085;margin-top:22px}.ver{font-family:monospace}
+</style></head><body>
+<header><h1>SENS INSTALLER V2.1</h1><div>Instalação + provisionamento Wi‑Fi pelo navegador</div></header>
+<div class="banner"><strong>Firmware:</strong> <span class="ver">2.2.1-RC5B8 Rev.07 IMPROV WIFI</span> &nbsp;•&nbsp; <strong>PoC:</strong> Improv Serial</div>
+<div class="grid">
+<section class="card green">
+<h2>ATUALIZAR — PRESERVAR</h2>
+<p>Atualiza o firmware mantendo a identidade e os dados persistentes do equipamento.</p>
+<div class="warn"><strong>Se aparecer “Erase device”:</strong> deixe DESMARCADO.</div>
+<esp-web-install-button manifest="manifest-preservar.json">
+<button slot="activate">ATUALIZAR E PRESERVAR</button>
+<span slot="unsupported">Use Chrome ou Edge compatível com Web Serial.</span>
+</esp-web-install-button>
+<small>Credenciais Wi‑Fi já provisionadas também devem permanecer.</small>
+</section>
+<section class="card red">
+<h2>INSTALAR DO ZERO + WI‑FI</h2>
+<p>Apaga a identidade anterior e instala a Rev.07 limpa.</p>
+<div class="wifi"><strong>🧪 NOVO:</strong> após a gravação, mantenha o ESP32 conectado. O ESP Web Tools deverá detectar o Improv e abrir a etapa de configuração Wi‑Fi.</div>
+<esp-web-install-button manifest="manifest-do-zero.json">
+<button slot="activate">INSTALAR DO ZERO</button>
+<span slot="unsupported">Use Chrome ou Edge compatível com Web Serial.</span>
+</esp-web-install-button>
+<small>Resultado esperado: novo Epoch + Seq 1 + Wi‑Fi configurado pelo navegador.</small>
+</section>
+</div>
+<footer>SENS Platform • G2E — Gases do Efeito Estufa</footer>
+</body></html>
