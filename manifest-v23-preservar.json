@@ -1,0 +1,31 @@
+{
+  "name": "SENS Platform — Atualizar preservando dados",
+  "version": "2.2.1-RC5B8 Rev.09 WIZARD SERIAL",
+  "home_assistant_domain": "esphome",
+  "new_install_prompt_erase": true,
+  "improv": true,
+  "new_install_improv_wait_time": 20,
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        {
+          "path": "firmware/SENS_BOOTLOADER.bin",
+          "offset": 4096
+        },
+        {
+          "path": "firmware/SENS_PARTITIONS.bin",
+          "offset": 32768
+        },
+        {
+          "path": "firmware/SENS_BOOT_APP0.bin",
+          "offset": 57344
+        },
+        {
+          "path": "firmware/SENS_APP_REV09.bin",
+          "offset": 65536
+        }
+      ]
+    }
+  ]
+}
