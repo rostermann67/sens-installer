@@ -1,0 +1,18 @@
+{
+  "name": "SENS Platform - Rev.08 CONFIG WEB - Instalar do zero",
+  "version": "2.2.1-RC5B8-REV08-CONFIG-WEB-CLEAN",
+  "new_install_prompt_erase": false,
+  "new_install_improv_wait_time": 20,
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "improv": true,
+      "parts": [
+        {
+          "path": "firmware/SENS_MERGED_REV08_CONFIG_WEB.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}

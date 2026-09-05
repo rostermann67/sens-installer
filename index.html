@@ -1,0 +1,28 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SENS Installer V2.2</title>
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+<style>
+:root{font-family:Arial,sans-serif;color:#172033;background:#f5f7f6}body{max-width:1000px;margin:auto;padding:28px 18px 52px}
+header{background:#205514;color:#fff;border-radius:16px;padding:25px 28px;margin-bottom:20px}header h1{margin:0 0 5px;font-size:30px}
+.banner{background:#fff2cc;border-radius:11px;padding:13px 15px;margin-bottom:17px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:20px}
+.card{background:#fff;border:1px solid #d1d5db;border-radius:16px;padding:24px;box-shadow:0 3px 12px #0001}.green{border-top:7px solid #38761d}.red{border-top:7px solid #b00000}
+.box{background:#eaf4e6;border-radius:10px;padding:12px 14px;margin:15px 0}.warn{background:#fce5cd;border-radius:10px;padding:12px 14px;margin:15px 0}
+button{border:0;border-radius:10px;padding:13px 18px;color:#fff;font-weight:700;font-size:16px;cursor:pointer}.green button{background:#38761d}.red button{background:#b00000}
+.flow{background:#fff;border:1px solid #d1d5db;border-radius:16px;padding:20px 24px;margin-top:20px}.flow strong{color:#205514}
+small{display:block;margin-top:10px;color:#667085}footer{text-align:center;color:#667085;margin-top:22px}.ver{font-family:monospace}
+</style></head><body>
+<header><h1>SENS INSTALLER V2.2</h1><div>Instalação + Wi‑Fi + configuração da identidade SENS</div></header>
+<div class="banner"><strong>Firmware:</strong> <span class="ver">2.2.1-RC5B8 Rev.08 CONFIG WEB</span> &nbsp;•&nbsp; <strong>PoC:</strong> Nome + Serial persistentes</div>
+<div class="grid">
+<section class="card green"><h2>ATUALIZAR — PRESERVAR</h2>
+<p>Atualiza para a Rev.08 mantendo NVS, Wi‑Fi, Epoch, Seq, buffer e identidade Web já salva.</p>
+<div class="warn"><strong>Erase device:</strong> deixe DESMARCADO.</div>
+<esp-web-install-button manifest="manifest-v22-preservar.json"><button slot="activate">ATUALIZAR E PRESERVAR</button><span slot="unsupported">Use Chrome ou Edge com Web Serial.</span></esp-web-install-button>
+</section>
+<section class="card red"><h2>INSTALAR DO ZERO</h2>
+<p>Instala a Rev.08 limpa. Depois da gravação, o navegador provisionará o Wi‑Fi pelo Improv.</p>
+<div class="box"><strong>NOVO:</strong> após conectar ao Wi‑Fi, abra os Logs. O firmware mostrará <span class="ver">SENS CONFIG WEB: http://IP/</span>. Abra esse endereço para configurar <strong>Nome + Serial</strong>.</div>
+<esp-web-install-button manifest="manifest-v22-do-zero.json"><button slot="activate">INSTALAR DO ZERO</button><span slot="unsupported">Use Chrome ou Edge com Web Serial.</span></esp-web-install-button>
+</section></div>
+<section class="flow"><strong>Fluxo V2.2:</strong> Instalar → Configurar Wi‑Fi → abrir Logs → abrir endereço “SENS CONFIG WEB” → definir Nome + Serial → Salvar → ESP reinicia → conferir na SENS Platform.</section>
+<footer>SENS Platform • G2E — Gases do Efeito Estufa</footer></body></html>
