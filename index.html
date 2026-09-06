@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SENS Installer V2.6</title>
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+<style>
+:root{font-family:Arial,sans-serif;color:#152019;background:#f4f6f5}
+*{box-sizing:border-box}body{margin:0}header{background:#123f22;color:#fff;padding:24px;text-align:center}
+header h1{margin:0 0 5px}main{max-width:880px;margin:24px auto;padding:0 18px}
+.card{background:#fff;border:1px solid #d1d8d3;border-radius:15px;padding:22px;margin:16px 0}
+.step{font-size:.8rem;letter-spacing:.08em;font-weight:700;color:#1b6137}h2{margin:5px 0 14px}
+label{display:block;font-weight:700;margin:13px 0 6px}
+input,select{width:100%;padding:12px;border:1px solid #9ca7a0;border-radius:8px;font-size:1rem;background:#fff}
+button{padding:12px 17px;border:0;border-radius:9px;background:#1b6b3d;color:#fff;font-weight:700;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}.actions{display:flex;gap:12px;flex-wrap:wrap}
+.note{font-size:.94rem;line-height:1.45;color:#46534b}.status{margin-top:12px;padding:12px;border-radius:8px;background:#eef1ef;white-space:pre-wrap}
+.ok{background:#e7f5eb}.warn{background:#fff6d9}.err{background:#fdeaea}.hidden{display:none}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:650px){.grid{grid-template-columns:1fr}}
+footer{text-align:center;color:#626b65;padding:24px}
+</style>
+</head>
+<body>
+<header><h1>SENS INSTALLER V2.6</h1><div>SENS Platform • Pré-configuração → Instalação → Identidade → Wi‑Fi</div></header>
+<main>
+<section class="card">
+<div class="step">ETAPA 1 — PRÉ-CONFIGURAÇÃO</div><h2>Configure o equipamento</h2>
+<div class="grid"><div><label>Nome do equipamento</label><input id="name" placeholder="Ex.: Estação Teste Amarela"></div>
+<div><label>Serial / ID SENS</label><input id="serial" placeholder="Ex.: SENS-003"></div></div>
+<p class="note">Estes dados ficam guardados temporariamente no navegador. Eles só serão gravados no ESP32 depois da instalação.</p>
+<button id="save">GUARDAR CONFIGURAÇÃO</button><div id="saved" class="status">Aguardando Nome + Serial.</div>
+</section>
+
+<section class="card">
+<div class="step">ETAPA 2 — INSTALAÇÃO</div><h2>Instale o SENS</h2>
+<p class="note">O Wi‑Fi automático do ESP Web Tools está desativado nesta versão. Terminada a instalação, use a Etapa 3: ela grava automaticamente o Nome + Serial já salvos e, na mesma conexão USB, segue para a rede.</p>
+<div class="actions">
+<esp-web-install-button manifest="manifest-v26-do-zero.json"><button slot="activate">INSTALAR SENS DO ZERO</button></esp-web-install-button>
+<esp-web-install-button manifest="manifest-v26-preservar.json"><button slot="activate">ATUALIZAR — PRESERVAR DADOS</button></esp-web-install-button>
+</div>
+</section>
+
+<section class="card">
+<div class="step">ETAPA 3 — GRAVAR CONFIGURAÇÃO SENS</div><h2>Envie a configuração salva ao ESP32</h2>
+<p class="note">Depois de instalar, clique uma vez abaixo e selecione a porta do ESP32. O Installer chama o que foi guardado na Etapa 1, grava Nome + Serial na Rev.11, lê de volta para confirmar e somente então libera o Wi‑Fi.</p>
+<button id="apply">GRAVAR CONFIGURAÇÃO E CONTINUAR</button>
+<div id="cfgstatus" class="status">Aguardando instalação e conexão com o ESP32.</div>
+</section>
+
+<section class="card" id="wifiCard">
+<div class="step">ETAPA 4 — REDE • ÚLTIMA ETAPA</div><h2>Configure o Wi‑Fi</h2>
+<p class="note">A mesma sessão Improv é mantida aberta. Escolha uma rede detectada ou digite o SSID manualmente.</p>
+<label>Rede Wi‑Fi</label><select id="ssid"><option value="">Aguardando configuração SENS...</option></select>
+<label>SSID manual (se necessário)</label><input id="manual" placeholder="Digite apenas se a rede não aparecer acima">
+<label>Senha</label><input id="password" type="password" placeholder="Senha da rede">
+<div class="actions" style="margin-top:14px"><button id="connect" disabled>CONECTAR E FINALIZAR</button><button id="rescan" disabled>ATUALIZAR REDES</button></div>
+<div id="wstatus" class="status">Wi‑Fi ainda não configurado nesta sessão.</div>
+</section>
+</main><footer>SENS Platform • SENS Installer</footer>
+
+<script type="module">
+import {SensImprov} from './sens-improv.js';
+
+const $=id=>document.getElementById(id);
+let improv=null, port=null;
+
+function getSaved(){
+  try{return JSON.parse(localStorage.getItem("sensInstallerV26")||"null")}catch(e){return null}
+}
+function setStatus(id,text,kind=""){
+  const e=$(id);e.textContent=text;e.className="status "+kind;
+}
+function validSerial(s){return /^[A-Za-z0-9-]+$/.test(s);}
+function saveConfig(){
+  const name=$("name").value.trim(), serial=$("serial").value.trim();
+  if(!name || !serial){alert("Preencha Nome e Serial.");return false;}
+  if(!validSerial(serial)){alert("No Serial use apenas letras, números e hífen.");return false;}
+  const c={name,serial}; localStorage.setItem("sensInstallerV26",JSON.stringify(c));
+  setStatus("saved",`Guardado no navegador:\nNome: ${name}\nSerial: ${serial}`,"ok");
+  return true;
+}
+$("save").onclick=saveConfig;
+
+async function scanNetworks(){
+  $("rescan").disabled=true; $("connect").disabled=true;
+  setStatus("wstatus","Procurando redes Wi‑Fi...");
+  try{
+    const nets=await improv.scan();
+    const sel=$("ssid"); sel.innerHTML='<option value="">Selecione uma rede...</option>';
+    for(const n of nets){
+      const o=document.createElement("option"); o.value=n.name;
+      o.textContent=`${n.name}  (${n.rssi} dBm${n.secured?", protegida":", aberta"})`; sel.appendChild(o);
+    }
+    setStatus("wstatus", nets.length?`${nets.length} rede(s) encontrada(s). Selecione uma ou use SSID manual.`:"Nenhuma rede listada. Você pode digitar o SSID manualmente.","ok");
+  }catch(e){
+    $("ssid").innerHTML='<option value="">Scan indisponível — use SSID manual</option>';
+    setStatus("wstatus","Não foi possível listar redes. Digite o SSID manualmente.\nDetalhe: "+e.message,"warn");
+  }finally{
+    $("rescan").disabled=false;$("connect").disabled=false;
+  }
+}
+$("rescan").onclick=scanNetworks;
+
+$("apply").onclick=async()=>{
+  if(!saveConfig()) return;
+  const c=getSaved(); $("apply").disabled=true;
+  setStatus("cfgstatus","Abrindo a porta serial do ESP32...");
+  try{
+    if(!("serial" in navigator)) throw new Error("Este navegador não oferece Web Serial. Use Chrome ou Edge no computador.");
+    port=await navigator.serial.requestPort();
+    improv=new SensImprov(port,console.log);
+    await improv.open();
+    setStatus("cfgstatus","ESP32 conectado. Identificando Improv...");
+    const info=await improv.initialize();
+    setStatus("cfgstatus","Improv detectado. Gravando Nome...");
+    const gotName=await improv.setDeviceName(c.name);
+    if(gotName!==c.name) throw new Error(`Nome retornado pelo ESP32 não confere: "${gotName}"`);
+    setStatus("cfgstatus","✓ Nome gravado\nGravando Serial / ID SENS...");
+    const gotSerial=await improv.setHostname(c.serial);
+    if(gotSerial!==c.serial) throw new Error(`Serial retornado pelo ESP32 não confere: "${gotSerial}"`);
+    const verifyName=await improv.getDeviceName();
+    const verifySerial=await improv.getHostname();
+    if(verifyName!==c.name || verifySerial!==c.serial) throw new Error("Falha na leitura de confirmação da identidade.");
+    setStatus("cfgstatus",`✓ Nome gravado e confirmado: ${verifyName}\n✓ Serial gravado e confirmado: ${verifySerial}\n\nConfiguração SENS concluída. Seguindo para o Wi‑Fi.`,"ok");
+    await scanNetworks();
+  }catch(e){
+    setStatus("cfgstatus","Não foi possível concluir a configuração SENS.\n"+e.message,"err");
+    $("apply").disabled=false;
+    try{await improv?.close()}catch(_){}
+    improv=null;port=null;
+  }
+};
+
+$("connect").onclick=async()=>{
+  if(!improv){setStatus("wstatus","Conecte primeiro pela Etapa 3.","err");return;}
+  const ssid=$("manual").value.trim() || $("ssid").value;
+  const password=$("password").value;
+  if(!ssid){alert("Selecione ou digite a rede Wi‑Fi.");return;}
+  $("connect").disabled=true;$("rescan").disabled=true;
+  setStatus("wstatus",`Conectando à rede "${ssid}"...`);
+  try{
+    await improv.provision(ssid,password);
+    setStatus("wstatus",`✓ Wi‑Fi provisionado.\n✓ Identidade SENS já estava confirmada.\n\nSENS OPERACIONAL.`,"ok");
+    try{await improv.close()}catch(_){}
+    improv=null;port=null;
+  }catch(e){
+    setStatus("wstatus","Não foi possível conectar ao Wi‑Fi.\n"+e.message,"err");
+    $("connect").disabled=false;$("rescan").disabled=false;
+  }
+};
+
+const c=getSaved();
+if(c){$("name").value=c.name||"";$("serial").value=c.serial||"";setStatus("saved",`Guardado no navegador:\nNome: ${c.name}\nSerial: ${c.serial}`,"ok");}
+</script>
+</body></html>
