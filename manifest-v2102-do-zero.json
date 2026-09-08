@@ -1,0 +1,18 @@
+{
+  "name": "SENS Platform — V2.10.2 — Instalar do zero",
+  "version": "2.10.2 / Rev.15A",
+  "new_install_prompt_erase": false,
+  "new_install_improv_wait_time": 0,
+  "improv": true,
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        {
+          "path": "firmware/SENS_MERGED_REV15A.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}
