@@ -1,0 +1,24 @@
+{
+  "name": "SENS Rev.15C - Atualizar preservando dados",
+  "version": "2.2.1-RC5B8 Rev.15C",
+  "new_install_prompt_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        {
+          "path": "firmware/SENS_BOOTLOADER_REV15C.bin",
+          "offset": 4096
+        },
+        {
+          "path": "firmware/SENS_PARTITIONS_REV15C.bin",
+          "offset": 32768
+        },
+        {
+          "path": "firmware/SENS_APP_REV15C.bin",
+          "offset": 65536
+        }
+      ]
+    }
+  ]
+}
