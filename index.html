@@ -42,7 +42,7 @@ details.config-group>summary{font-weight:800;color:#176b3a;cursor:pointer}
 </style>
 </head>
 <body>
-<header><h1>SENS INSTALLER V2.10.5.1</h1><div>SENS Platform • Configuração → Instalação → Gravação → Wi‑Fi → Monitor</div></header>
+<header><h1>SENS INSTALLER V2.10.5.2</h1><div>SENS Platform • Configuração → Instalação → Gravação → Wi‑Fi → Monitor</div></header>
 <main>
 <section class="card" id="preconfigCard">
 <div class="step">ETAPA 1 — CONFIGURAÇÃO DO EQUIPAMENTO</div><h2>Configure o SENS antes de instalar</h2>
@@ -80,8 +80,28 @@ details.config-group>summary{font-weight:800;color:#176b3a;cursor:pointer}
 <div><b>GPIO4</b> DHT22</div><div><b>GPIO13</b> DS18B20</div><div><b>GPIO35</b> T6613 ADC</div><div><b>GPIO16/17</b> T6613 UART</div>
 <div><b>GPIO21/22</b> I²C compartilhado</div><div><b>GPIO18/5/19</b> MAX6675</div><div><b>0x48</b> ADS1115</div><div><b>0x23</b> BH1750</div><div><b>0x39</b> APDS9960</div></div>
 <div id="pinWarnings" class="warn">Mapa ativo. Conflitos de GPIO dos genéricos serão sinalizados.</div></details>
-<details class="config-group"><summary>2 sensores genéricos / industriais</summary><p class="smallnote">Quando o slot está DESATIVADO, o Installer confirma somente o estado OFF. Metadados antigos/defaults na NVS não geram falso erro.</p><div id="genericSlots"></div></details>
-<details class="config-group"><summary>Correção metrológica — y = a × x + b</summary><p class="smallnote">2 correções metrológicas disponíveis, por sensor + grandeza. Linhas OFF e vazias são ignoradas.</p><div id="correctionSlots"></div></details>
+<details class="config-group"><summary>2 sensores genéricos / industriais</summary><p class="smallnote">Quando o slot está DESATIVADO, o Installer confirma somente o estado OFF. Metadados antigos/defaults na NVS não geram falso erro.</p><div id="genericSlots"><div class="sensorbox"><b>GENÉRICO 1</b><div class="config-grid">
+<label>Ativo<select id="g0_en"><option value="0">NÃO</option><option value="1">SIM</option></select></label><label>ID<input id="g0_id" value="G01"></label>
+<label>Modelo<input id="g0_model"></label><label>Fabricante<input id="g0_mfr"></label><label>Interface<select id="g0_if"><option value="10">ADC ESP32</option><option value="11">ADS1115</option><option value="20">RS485/Modbus</option><option value="21">4–20 mA</option><option value="22">RS232</option><option value="23">0–10 V</option><option value="24">PULSO/FREQUÊNCIA</option></select></label>
+<label>GPIO<input id="g0_gpio" value="-1"></label><label>Grandeza<input id="g0_qty"></label><label>Unidade<input id="g0_unit"></label>
+<label>Entrada mín<input id="g0_in0" value="0"></label><label>Entrada máx<input id="g0_in1" value="3.3"></label><label>Escala mín<input id="g0_sc0" value="0"></label><label>Escala máx<input id="g0_sc1" value="100"></label>
+<label>Baud<input id="g0_baud" value="9600"></label><label>Slave<input id="g0_slave" value="1"></label><label>Register<input id="g0_reg" value="0"></label><label>Fator<input id="g0_factor" value="1"></label>
+<label>Pulsos/unidade<input id="g0_ppu" value="450"></label><label>Janela pulso ms<input id="g0_pwin" value="1000"></label><label>Totalizador<select id="g0_total"><option value="1">SIM</option><option value="0">NÃO</option></select></label>
+</div></div><div class="sensorbox"><b>GENÉRICO 2</b><div class="config-grid">
+<label>Ativo<select id="g1_en"><option value="0">NÃO</option><option value="1">SIM</option></select></label><label>ID<input id="g1_id" value="G02"></label>
+<label>Modelo<input id="g1_model"></label><label>Fabricante<input id="g1_mfr"></label><label>Interface<select id="g1_if"><option value="10">ADC ESP32</option><option value="11">ADS1115</option><option value="20">RS485/Modbus</option><option value="21">4–20 mA</option><option value="22">RS232</option><option value="23">0–10 V</option><option value="24">PULSO/FREQUÊNCIA</option></select></label>
+<label>GPIO<input id="g1_gpio" value="-1"></label><label>Grandeza<input id="g1_qty"></label><label>Unidade<input id="g1_unit"></label>
+<label>Entrada mín<input id="g1_in0" value="0"></label><label>Entrada máx<input id="g1_in1" value="3.3"></label><label>Escala mín<input id="g1_sc0" value="0"></label><label>Escala máx<input id="g1_sc1" value="100"></label>
+<label>Baud<input id="g1_baud" value="9600"></label><label>Slave<input id="g1_slave" value="1"></label><label>Register<input id="g1_reg" value="0"></label><label>Fator<input id="g1_factor" value="1"></label>
+<label>Pulsos/unidade<input id="g1_ppu" value="450"></label><label>Janela pulso ms<input id="g1_pwin" value="1000"></label><label>Totalizador<select id="g1_total"><option value="1">SIM</option><option value="0">NÃO</option></select></label>
+</div></div></div></details>
+<details class="config-group"><summary>Correção metrológica — y = a × x + b</summary><p class="smallnote">2 correções metrológicas disponíveis, por sensor + grandeza. Linhas OFF e vazias são ignoradas.</p><div id="correctionSlots"><div class="sensorbox"><b>CANAL 1</b><div class="config-grid">
+<label>APLICAR CORREÇÃO<select id="c0_en"><option value="0">NÃO</option><option value="1">SIM</option></select></label><label>Sensor ID<input id="c0_sid"></label><label>Grandeza<input id="c0_qty"></label><label>Ganho (a)<input id="c0_a" value="1"></label>
+<label>Offset (b)<input id="c0_b" value="0"></label><label>ID da Aferição<input id="c0_cid"></label><label>Verificada<select id="c0_ver"><option value="0">NÃO</option><option value="1">SIM</option></select></label>
+</div><div class="smallnote" id="c0_eq" style="margin-top:10px;font-weight:700">Equação: y = 1 × x + 0</div></div><div class="sensorbox"><b>CANAL 2</b><div class="config-grid">
+<label>APLICAR CORREÇÃO<select id="c1_en"><option value="0">NÃO</option><option value="1">SIM</option></select></label><label>Sensor ID<input id="c1_sid"></label><label>Grandeza<input id="c1_qty"></label><label>Ganho (a)<input id="c1_a" value="1"></label>
+<label>Offset (b)<input id="c1_b" value="0"></label><label>ID da Aferição<input id="c1_cid"></label><label>Verificada<select id="c1_ver"><option value="0">NÃO</option><option value="1">SIM</option></select></label>
+</div><div class="smallnote" id="c1_eq" style="margin-top:10px;font-weight:700">Equação: y = 1 × x + 0</div></div></div></details>
 <div class="actions"><button id="save">GUARDAR CONFIGURAÇÃO</button><button id="newConfig" type="button">NOVA CONFIGURAÇÃO / LIMPAR CAMPOS</button></div><div id="saved" class="status">Preencha e guarde a configuração antes da instalação.</div>
 </section>
 
@@ -262,7 +282,18 @@ function setStatus(id,text,kind=""){
 }
 function validSerial(s){return /^[A-Za-z0-9-]+$/.test(s);}
 function buildV28(){
- let g=$("genericSlots");for(let i=0;i<2;i++){let d=document.createElement("div");d.className="sensorbox";d.innerHTML=`<b>GENÉRICO ${i+1}</b><div class="config-grid">
+ let g=$("genericSlots");
+ if(g && g.querySelector("#g0_en")){
+   for(let i=0;i<2;i++){
+     for(const k of ["en","sid","qty","a","b","cid","ver"]){
+       const el=$("c"+i+"_"+k);
+       if(el){ el.addEventListener("input",()=>updateCorrectionPreview(i)); el.addEventListener("change",()=>updateCorrectionPreview(i)); }
+     }
+     updateCorrectionPreview(i);
+   }
+   return;
+ }
+for(let i=0;i<2;i++){let d=document.createElement("div");d.className="sensorbox";d.innerHTML=`<b>GENÉRICO ${i+1}</b><div class="config-grid">
 <label>Ativo<select id="g${i}_en"><option value="0">NÃO</option><option value="1">SIM</option></select></label><label>ID<input id="g${i}_id" value="G${String(i+1).padStart(2,"0")}"></label>
 <label>Modelo<input id="g${i}_model"></label><label>Fabricante<input id="g${i}_mfr"></label><label>Interface<select id="g${i}_if"><option value="10">ADC ESP32</option><option value="11">ADS1115</option><option value="20">RS485/Modbus</option><option value="21">4–20 mA</option><option value="22">RS232</option><option value="23">0–10 V</option><option value="24">PULSO/FREQUÊNCIA</option></select></label>
 <label>GPIO<input id="g${i}_gpio" value="-1"></label><label>Grandeza<input id="g${i}_qty"></label><label>Unidade<input id="g${i}_unit"></label>
