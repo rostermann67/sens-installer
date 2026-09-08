@@ -42,7 +42,7 @@ details.config-group>summary{font-weight:800;color:#176b3a;cursor:pointer}
 </style>
 </head>
 <body>
-<header><h1>SENS INSTALLER V2.10.5.4</h1><div>SENS Platform • Configuração → Instalação → Gravação → Wi‑Fi → Monitor</div></header>
+<header><h1>SENS INSTALLER V2.10.5.5</h1><div>SENS Platform • Configuração → Instalação → Gravação → Wi‑Fi → Monitor</div></header>
 <main>
 <section class="card" id="preconfigCard">
 <div class="step">ETAPA 1 — CONFIGURAÇÃO DO EQUIPAMENTO</div><h2>Configure o SENS antes de instalar</h2>
@@ -103,12 +103,12 @@ details.config-group>summary{font-weight:800;color:#176b3a;cursor:pointer}
 
 <section class="card" id="wifiCard">
 <div class="step">ETAPA 4 — REDE • ÚLTIMA ETAPA</div><h2>Configure o Wi‑Fi</h2>
-<p class="note">Após o COMMIT Rev.15D1, o Installer reabre o Improv automaticamente para a rede. Escolha uma rede detectada ou digite o SSID manualmente.</p>
-<label>Rede Wi‑Fi</label><select id="ssid"><option value="">Aguardando configuração SENS...</option></select>
+<p class="note">A configuração SENS termina completamente na Etapa 3. Para configurar a rede, clique em PREPARAR WI‑FI, selecione novamente a porta do ESP32 e então escolha uma rede detectada ou digite o SSID manualmente.</p>
+<label>Rede Wi‑Fi</label><select id="ssid"><option value="">Aguardando preparação da rede...</option></select>
 <label>SSID manual (se necessário)</label><input id="manual" placeholder="Digite apenas se a rede não aparecer acima">
 <label>Senha</label><input id="password" type="password" placeholder="Senha da rede">
-<div class="actions" style="margin-top:14px"><button id="connect" disabled>CONECTAR E FINALIZAR</button><button id="rescan" disabled>ATUALIZAR REDES</button></div>
-<div id="wstatus" class="status">Wi‑Fi ainda não configurado nesta sessão.</div>
+<div class="actions" style="margin-top:14px"><button id="wifiStart" disabled>PREPARAR WI‑FI</button><button id="connect" disabled>CONECTAR E FINALIZAR</button><button id="rescan" disabled>ATUALIZAR REDES</button></div>
+<div id="wstatus" class="status">Conclua a Etapa 3 antes de configurar o Wi‑Fi.</div>
 </section>
 
 <section class="card" id="configCard">
@@ -255,7 +255,7 @@ function appendMonitor(text){
 
 
 function getSaved(){
-  try{return JSON.parse(localStorage.getItem("sensInstallerV21053")||"null")}catch(e){return null}
+  try{return JSON.parse(localStorage.getItem("sensInstallerV21055")||"null")}catch(e){return null}
 }
 function setStatus(id,text,kind=""){
   const e=$(id);e.textContent=text;e.className="status "+kind;
@@ -302,7 +302,7 @@ function restoreFull(c){
   const a=kvObj(c.advanced||"");for(const [k,id] of Object.entries({tmode:"tmode",aif:"aif",div:"divider",divr:"divratio",mavg:"mavg",mwin:"mwin",warm:"warm",i_dht:"i_dht",i_ds:"i_ds",i_t66:"i_t66",i_b18:"i_b18",i_be2:"i_be2",i_be6:"i_be6",i_b38:"i_b38",i_bh:"i_bh",i_ap:"i_ap",i_th:"i_th",i_gps:"i_gps"}))if(k in a)V(id,a[k]);
   for(let i=0;i<2;i++){const g=kvObj(c.generics?.[i]||"");for(const k of ["en","id","model","mfr","if","gpio","qty","unit","in0","in1","sc0","sc1","baud","slave","reg","factor","ppu","pwin","total"])if(k in g)V(`g${i}_${k}`,g[k]);const q=kvObj(c.corrections?.[i]||"");for(const k of ["sid","qty","a","b","cid","en","ver"])if(k in q)V(`c${i}_${k}`,q[k]);updateCorrectionPreview(i);}
 }
-function clearNewConfig(){localStorage.removeItem("sensInstallerV21053");location.reload();}
+function clearNewConfig(){localStorage.removeItem("sensInstallerV21055");location.reload();}
 function fmtKv(x,kind){const o=kvObj(x||"");if(kind==="generic")return String(o.en)!=="1"?"DESATIVADO":`${o.id||"—"} • ${o.model||"—"} • ${o.qty||"—"} ${o.unit||""} • GPIO ${o.gpio||"—"} • fator ${o.factor||"—"}`;if(kind==="corr")return String(o.en)!=="1"?"DESATIVADA":`${o.sid||"—"} • ${o.qty||"—"} • y = ${o.a||1} × x + ${o.b||0} • Aferição ${o.cid||"—"}`;return Object.entries(o).map(([k,v])=>`${k}=${v}`).join(" • ")||"—";}
 function saveConfig(){
   const name=$("name").value.trim(),serial=$("serial").value.trim();
@@ -315,12 +315,38 @@ function saveConfig(){
     bh1750:$("s_bh1750").checked,apds:$("s_apds").checked,thermok:$("s_thermok").checked,
     gps:$("s_gps").checked,dsMode:parseInt($("dsMode").value,10)}};
   c.advanced=advForm();c.generics=Array.from({length:2},(_,i)=>genForm(i));c.corrections=Array.from({length:2},(_,i)=>corForm(i));
-  localStorage.setItem("sensInstallerV21053",JSON.stringify(c));
+  localStorage.setItem("sensInstallerV21055",JSON.stringify(c));
   setStatus("saved",`Configuração guardada.\nNome: ${name}\nSerial: ${serial}\nPapel: ${c.role}\nIntervalo: ${c.sendSec}s`,"ok");
   return true;
 }
 $("save").onclick=saveConfig;
 $("newConfig").onclick=()=>{if(confirm("Limpar a configuração guardada nesta versão e iniciar um novo equipamento?"))clearNewConfig();};
+
+async function startWifiStage(){
+  $("wifiStart").disabled=true;
+  $("connect").disabled=true;
+  $("rescan").disabled=true;
+  setStatus("wstatus","Abrindo a porta serial para a Etapa 4...");
+  try{
+    if(!("serial" in navigator)) throw new Error("Este navegador não oferece Web Serial. Use Chrome ou Edge no computador.");
+    port=await navigator.serial.requestPort();
+    improv=new SensImprov(port,console.log);
+    await improv.open();
+    setStatus("wstatus","ESP32 conectado. Preparando Improv para o Wi‑Fi...");
+    await new Promise(r=>setTimeout(r,2500));
+    await improv.initialize();
+    $("connect").disabled=false;
+    $("rescan").disabled=false;
+    await scanNetworks();
+  }catch(e){
+    setStatus("wstatus","Não foi possível preparar o Wi‑Fi.\n"+e.message,"err");
+    try{await improv?.close()}catch(_){}
+    improv=null;
+    port=null;
+    $("wifiStart").disabled=false;
+  }
+}
+$("wifiStart").onclick=startWifiStage;
 
 async function scanNetworks(){
   $("rescan").disabled=true; $("connect").disabled=true;
@@ -683,13 +709,13 @@ $("apply").onclick=async()=>{
 ✓ COMMIT único válido.
 ✓ Snapshot relido da NVS.
 ✓ Fingerprint: ${tx.fp}
+✓ CONFIGURAÇÃO SENS GRAVADA.
 
-Reabrindo Improv para o Wi‑Fi...`,"ok");
-    improv=new SensImprov(port,console.log);
-    await improv.open();
-    await new Promise(r=>setTimeout(r,2400));
-    await improv.initialize();
-    await scanNetworks();
+Etapa 3 concluída. Prossiga para a Etapa 4 quando quiser configurar o Wi‑Fi.`,"ok");
+    improv=null;
+    port=null;
+    $("wifiStart").disabled=false;
+    setStatus("wstatus","Etapa 3 concluída. Clique em PREPARAR WI‑FI para configurar a rede.","ok");
   }catch(e){
     setStatus("cfgstatus","Não foi possível concluir a configuração SENS.\n"+e.message,"err");
     $("apply").disabled=false;
@@ -730,6 +756,9 @@ $("connect").onclick=async()=>{
     improv=null;port=null;
   }catch(e){
     setStatus("wstatus","Não foi possível conectar ao Wi‑Fi.\n"+e.message,"err");
+    try{await improv?.close()}catch(_){}
+    improv=null; port=null;
+    $("wifiStart").disabled=false;
     $("connect").disabled=false;$("rescan").disabled=false;
   }
 };
