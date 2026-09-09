@@ -42,7 +42,7 @@ details.config-group>summary{font-weight:800;color:#176b3a;cursor:pointer}
 </style>
 </head>
 <body>
-<header><h1>SENS INSTALLER V2.10.5.7</h1><div>SENS Platform • Configuração → Instalação → Gravação → Wi‑Fi → Monitor</div></header>
+<header><h1>SENS INSTALLER V2.10.5.8</h1><div>SENS Platform • Configuração → Instalação → Gravação → Wi‑Fi → Monitor</div></header>
 <main>
 <section class="card" id="preconfigCard">
 <div class="step">ETAPA 1 — CONFIGURAÇÃO DO EQUIPAMENTO</div><h2>Configure o SENS antes de instalar</h2>
@@ -81,7 +81,7 @@ details.config-group>summary{font-weight:800;color:#176b3a;cursor:pointer}
 <div><b>GPIO21/22</b> I²C compartilhado</div><div><b>GPIO18/5/19</b> MAX6675</div><div><b>0x48</b> ADS1115</div><div><b>0x23</b> BH1750</div><div><b>0x39</b> APDS9960</div></div>
 <div id="pinWarnings" class="warn">Mapa ativo. Conflitos de GPIO dos genéricos serão sinalizados.</div></details>
 <details class="config-group"><summary>2 sensores genéricos / industriais</summary><p class="smallnote">Quando o slot está DESATIVADO, o Installer confirma somente o estado OFF. Metadados antigos/defaults na NVS não geram falso erro.</p><div id="genericSlots"></div></details>
-<details class="config-group"><summary>Correção metrológica — y = a × x + b</summary><p class="smallnote">2 correções metrológicas disponíveis, por sensor + grandeza. Linhas OFF e vazias são ignoradas.</p><div id="correctionSlots"></div></details>
+<details class="config-group"><summary>Correção metrológica — y = a × x + b</summary><p class="smallnote">2 correções metrológicas disponíveis. Escolha o sensor/canal habilitado e depois a grandeza. Vale para sensores nativos e genéricos. Linhas OFF e vazias são ignoradas.</p><div id="correctionSlots"></div></details>
 <div class="actions"><button id="save">GUARDAR CONFIGURAÇÃO</button><button id="newConfig" type="button">NOVA CONFIGURAÇÃO / LIMPAR CAMPOS</button></div><div id="saved" class="status">Preencha e guarde a configuração antes da instalação.</div>
 </section>
 
@@ -270,10 +270,84 @@ function buildV28(){
 <label>Baud<input id="g${i}_baud" value="9600"></label><label>Slave<input id="g${i}_slave" value="1"></label><label>Register<input id="g${i}_reg" value="0"></label><label>Fator<input id="g${i}_factor" value="1"></label>
 <label>Pulsos/unidade<input id="g${i}_ppu" value="450"></label><label>Janela pulso ms<input id="g${i}_pwin" value="1000"></label><label>Totalizador<select id="g${i}_total"><option value="1">SIM</option><option value="0">NÃO</option></select></label></div>`;g.appendChild(d)}
  let c=$("correctionSlots");for(let i=0;i<2;i++){let d=document.createElement("div");d.className="sensorbox";d.innerHTML=`<b>CANAL ${i+1}</b><div class="config-grid">
-<label>APLICAR CORREÇÃO<select id="c${i}_en"><option value="0">NÃO</option><option value="1">SIM</option></select></label><label>Sensor ID<input id="c${i}_sid"></label><label>Grandeza<input id="c${i}_qty"></label><label>Ganho (a)<input id="c${i}_a" value="1"></label>
+<label>APLICAR CORREÇÃO<select id="c${i}_en"><option value="0">NÃO</option><option value="1">SIM</option></select></label><label>Sensor / canal<select id="c${i}_sid"><option value="">Selecione um sensor habilitado...</option></select></label><label>Grandeza<select id="c${i}_qty"><option value="">Selecione primeiro o sensor...</option></select></label><label>Ganho (a)<input id="c${i}_a" value="1"></label>
 <label>Offset (b)<input id="c${i}_b" value="0"></label><label>ID da Aferição<input id="c${i}_cid"></label><label>Verificada<select id="c${i}_ver"><option value="0">NÃO</option><option value="1">SIM</option></select></label></div><div class="smallnote" id="c${i}_eq" style="margin-top:10px;font-weight:700">Equação: y = 1 × x + 0</div>`;c.appendChild(d);
  for(const k of ["en","sid","qty","a","b","cid","ver"]){$("c"+i+"_"+k).addEventListener("input",()=>updateCorrectionPreview(i));$("c"+i+"_"+k).addEventListener("change",()=>updateCorrectionPreview(i));} updateCorrectionPreview(i)}
+ wireCorrectionMenus();
 }
+
+const CORR_NATIVE = {
+  S_DHT22:{label:"DHT22", quantities:["temperature","humidity"]},
+  S_DS1:{label:"DS18B20 — sensor 1", quantities:["temperature"]},
+  S_DS2:{label:"DS18B20 — sensor 2", quantities:["temperature"]},
+  S_BMP180:{label:"BMP180", quantities:["temperature","pressure"]},
+  S_BME280:{label:"BME280", quantities:["temperature","humidity","pressure"]},
+  S_BME680:{label:"BME680", quantities:["temperature","humidity","pressure","gas_resistance"]},
+  S_BMP388:{label:"BMP388", quantities:["temperature","pressure","altitude"]},
+  S_BH1750:{label:"BH1750", quantities:["illuminance"]},
+  S_APDS9960:{label:"APDS9960", quantities:["proximity","red","green","blue","clear"]},
+  S_THK:{label:"Termopar K / MAX6675", quantities:["temperature"]},
+  S_CO2:{label:"T6613", quantities:["co2"]},
+  S_GPS:{label:"GPS", quantities:["latitude","longitude","altitude","satellites","speed","hdop"]}
+};
+const CORR_Q_LABEL = {
+  temperature:"Temperatura",humidity:"Umidade",pressure:"Pressão",gas_resistance:"Resistência do gás",
+  altitude:"Altitude",illuminance:"Iluminância",proximity:"Proximidade",red:"Vermelho",green:"Verde",
+  blue:"Azul",clear:"Clear",co2:"CO₂",latitude:"Latitude",longitude:"Longitude",satellites:"Satélites",
+  speed:"Velocidade",hdop:"HDOP"
+};
+function enabledCorrectionSensors(){
+  const a=[];
+  const add=(ok,id)=>{if(ok && CORR_NATIVE[id])a.push({id,label:CORR_NATIVE[id].label,quantities:[...CORR_NATIVE[id].quantities]})};
+  add($("s_dht22").checked,"S_DHT22");
+  const dm=parseInt($("dsMode").value||"0",10);
+  add(dm>=1,"S_DS1"); add(dm>=2,"S_DS2");
+  add($("s_bmp180").checked,"S_BMP180"); add($("s_bme280").checked,"S_BME280");
+  add($("s_bme680").checked,"S_BME680"); add($("s_bmp388").checked,"S_BMP388");
+  add($("s_bh1750").checked,"S_BH1750"); add($("s_apds").checked,"S_APDS9960");
+  add($("s_thermok").checked,"S_THK"); add($("s_t6613").checked,"S_CO2"); add($("s_gps").checked,"S_GPS");
+  for(let i=0;i<2;i++){
+    if($("g"+i+"_en")?.value==="1"){
+      const id=$("g"+i+"_id")?.value.trim(), qty=$("g"+i+"_qty")?.value.trim();
+      if(id)a.push({id,label:`${id} — ${$("g"+i+"_model")?.value.trim()||"Genérico "+(i+1)}`,quantities:qty?[qty]:[]});
+    }
+  }
+  return a;
+}
+function refreshCorrectionMenus(){
+  const sensors=enabledCorrectionSensors();
+  for(let i=0;i<2;i++){
+    const sid=$("c"+i+"_sid"), qty=$("c"+i+"_qty"); if(!sid||!qty)continue;
+    const oldSid=sid.value, oldQty=qty.value;
+    sid.innerHTML='<option value="">Selecione um sensor habilitado...</option>';
+    for(const s of sensors){const o=document.createElement("option");o.value=s.id;o.textContent=`${s.label}  [${s.id}]`;sid.appendChild(o)}
+    if([...sid.options].some(o=>o.value===oldSid))sid.value=oldSid;
+    else if(oldSid){const o=document.createElement("option");o.value=oldSid;o.textContent=`${oldSid} [configuração anterior]`;sid.appendChild(o);sid.value=oldSid}
+    refreshCorrectionQuantities(i,oldQty);
+  }
+}
+function refreshCorrectionQuantities(i,preferred=""){
+  const sid=$("c"+i+"_sid"), qty=$("c"+i+"_qty"); if(!sid||!qty)return;
+  const old=preferred||qty.value;
+  const s=enabledCorrectionSensors().find(x=>x.id===sid.value);
+  let qs=s?.quantities||[];
+  qty.innerHTML='<option value="">Selecione a grandeza...</option>';
+  for(const q of qs){const o=document.createElement("option");o.value=q;o.textContent=`${CORR_Q_LABEL[q]||q}  [${q}]`;qty.appendChild(o)}
+  if([...qty.options].some(o=>o.value===old))qty.value=old;
+  else if(old){const o=document.createElement("option");o.value=old;o.textContent=`${CORR_Q_LABEL[old]||old} [configuração anterior]`;qty.appendChild(o);qty.value=old}
+  updateCorrectionPreview(i);
+}
+function wireCorrectionMenus(){
+  const ids=["s_dht22","s_t6613","s_bmp180","s_bme280","s_bme680","s_bmp388","s_bh1750","s_apds","s_thermok","s_gps","dsMode"];
+  for(const id of ids)$(id)?.addEventListener("change",refreshCorrectionMenus);
+  for(let i=0;i<2;i++){
+    $("c"+i+"_sid")?.addEventListener("change",()=>refreshCorrectionQuantities(i));
+    for(const k of ["en","id","model","qty"])$("g"+i+"_"+k)?.addEventListener("input",refreshCorrectionMenus);
+    for(const k of ["en","id","model","qty"])$("g"+i+"_"+k)?.addEventListener("change",refreshCorrectionMenus);
+  }
+  refreshCorrectionMenus();
+}
+
 function advForm(){return `tmode=${$("tmode").value};aif=${$("aif").value};div=${$("divider").value};divr=${$("divratio").value};mavg=${$("mavg").value};mwin=${$("mwin").value};warm=${$("warm").value};i_dht=${$("i_dht").value};i_ds=${$("i_ds").value};i_t66=${$("i_t66").value};i_b18=${$("i_b18").value};i_be2=${$("i_be2").value};i_be6=${$("i_be6").value};i_b38=${$("i_b38").value};i_bh=${$("i_bh").value};i_ap=${$("i_ap").value};i_th=${$("i_th").value};i_gps=${$("i_gps").value}`}
 function genForm(i){return `en=${$("g"+i+"_en").value};id=${$("g"+i+"_id").value};model=${$("g"+i+"_model").value};mfr=${$("g"+i+"_mfr").value};if=${$("g"+i+"_if").value};qty=${$("g"+i+"_qty").value};unit=${$("g"+i+"_unit").value};gpio=${$("g"+i+"_gpio").value};in0=${$("g"+i+"_in0").value};in1=${$("g"+i+"_in1").value};sc0=${$("g"+i+"_sc0").value};sc1=${$("g"+i+"_sc1").value};baud=${$("g"+i+"_baud").value};slave=${$("g"+i+"_slave").value};reg=${$("g"+i+"_reg").value};factor=${$("g"+i+"_factor").value};ppu=${$("g"+i+"_ppu").value};pwin=${$("g"+i+"_pwin").value};total=${$("g"+i+"_total").value}`}
 function corForm(i){return `en=${$("c"+i+"_en").value};sid=${$("c"+i+"_sid").value};qty=${$("c"+i+"_qty").value};a=${$("c"+i+"_a").value};b=${$("c"+i+"_b").value};cid=${$("c"+i+"_cid").value};ver=${$("c"+i+"_ver").value}`}
@@ -301,6 +375,7 @@ function restoreFull(c){
   const z=c.sensors||{};for(const [id,k] of [["s_dht22","dht22"],["s_t6613","t6613"],["s_bmp180","bmp180"],["s_bme280","bme280"],["s_bme680","bme680"],["s_bmp388","bmp388"],["s_bh1750","bh1750"],["s_apds","apds"],["s_thermok","thermok"],["s_gps","gps"]])$(id).checked=!!z[k];V("dsMode",z.dsMode||0);
   const a=kvObj(c.advanced||"");for(const [k,id] of Object.entries({tmode:"tmode",aif:"aif",div:"divider",divr:"divratio",mavg:"mavg",mwin:"mwin",warm:"warm",i_dht:"i_dht",i_ds:"i_ds",i_t66:"i_t66",i_b18:"i_b18",i_be2:"i_be2",i_be6:"i_be6",i_b38:"i_b38",i_bh:"i_bh",i_ap:"i_ap",i_th:"i_th",i_gps:"i_gps"}))if(k in a)V(id,a[k]);
   for(let i=0;i<2;i++){const g=kvObj(c.generics?.[i]||"");for(const k of ["en","id","model","mfr","if","gpio","qty","unit","in0","in1","sc0","sc1","baud","slave","reg","factor","ppu","pwin","total"])if(k in g)V(`g${i}_${k}`,g[k]);const q=kvObj(c.corrections?.[i]||"");for(const k of ["sid","qty","a","b","cid","en","ver"])if(k in q)V(`c${i}_${k}`,q[k]);updateCorrectionPreview(i);}
+  refreshCorrectionMenus();
 }
 function clearNewConfig(){localStorage.removeItem("sensInstallerV21057");location.reload();}
 function fmtKv(x,kind){const o=kvObj(x||"");if(kind==="generic")return String(o.en)!=="1"?"DESATIVADO":`${o.id||"—"} • ${o.model||"—"} • ${o.qty||"—"} ${o.unit||""} • GPIO ${o.gpio||"—"} • fator ${o.factor||"—"}`;if(kind==="corr")return String(o.en)!=="1"?"DESATIVADA":`${o.sid||"—"} • ${o.qty||"—"} • y = ${o.a||1} × x + ${o.b||0} • Aferição ${o.cid||"—"}`;return Object.entries(o).map(([k,v])=>`${k}=${v}`).join(" • ")||"—";}
