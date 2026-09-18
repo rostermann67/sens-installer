@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SENS Installer V2.10.5.9</title>
+<title>SENS Installer NEXT — AQUISIÇÃO Rev.02A</title>
 <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
 <style>
 :root{font-family:Arial,sans-serif;color:#152019;background:#f4f6f5}
@@ -47,7 +47,7 @@ details.config-group>summary{font-weight:800;color:#176b3a;cursor:pointer}
 </style>
 </head>
 <body>
-<header><h1>SENS INSTALLER V2.10.6.2</h1><div>SENS Platform • Configuração → Instalação → Gravação → Wi‑Fi → Monitor</div></header>
+<header><h1>SENS INSTALLER NEXT — AQUISIÇÃO Rev.02D</h1><div>LAB • CONVERSOR ADC-I²C / ADS1115 → grandeza física • LINHAGEM EXPERIMENTAL</div></header>
 <main>
 <section class="card" id="preconfigCard">
 <div class="step">ETAPA 1 — CONFIGURAÇÃO DO EQUIPAMENTO</div><h2>Configure o SENS antes de instalar</h2>
@@ -61,22 +61,42 @@ details.config-group>summary{font-weight:800;color:#176b3a;cursor:pointer}
 <label>Papel<select id="role"><option value="NORMAL">NORMAL</option><option value="AFERIR">AFERIR</option><option value="REFERENCIA">REFERÊNCIA</option></select></label>
 <label>Intervalo de envio<select id="sendSec"><option value="60">1 minuto</option><option value="300">5 minutos</option><option value="600">10 minutos</option><option value="900">15 minutos</option><option value="1800">30 minutos</option></select></label>
 </div><label class="checkitem" style="margin-top:10px"><input type="checkbox" id="syncPlatform" checked> Sincronizar intervalo com a SENS Platform</label></fieldset>
-<fieldset class="config-group"><legend>Sensores nativos</legend><div class="checkgrid">
-<label class="checkitem"><input type="checkbox" id="s_dht22" checked> DHT22</label><label class="checkitem"><input type="checkbox" id="s_t6613" checked> T6613</label>
+<fieldset class="config-group"><legend>CATÁLOGO — sensores de configuração rápida</legend><div class="checkgrid">
+<label class="checkitem"><input type="checkbox" id="s_dht22" checked> DHT22</label>
 <label class="checkitem"><input type="checkbox" id="s_bmp180"> BMP180</label><label class="checkitem"><input type="checkbox" id="s_bme280"> BME280</label>
 <label class="checkitem"><input type="checkbox" id="s_bme680"> BME680</label><label class="checkitem"><input type="checkbox" id="s_bmp388"> BMP388</label>
 <label class="checkitem"><input type="checkbox" id="s_bh1750"> BH1750</label><label class="checkitem"><input type="checkbox" id="s_apds"> APDS9960</label>
 <label class="checkitem"><input type="checkbox" id="s_thermok"> Termopar K</label><label class="checkitem"><input type="checkbox" id="s_gps"> GPS</label>
-</div><div class="config-grid" style="margin-top:12px"><label>DS18B20<select id="dsMode"><option value="0">DESATIVADO</option><option value="1">1 sensor</option><option value="2">2 sensores</option><option value="3">AUTO</option></select></label>
-<div class="smallnote">VAZÃO/VOLUME e PULSO/FREQUÊNCIA já estão no catálogo Rev.12C; o driver genérico de pulsos entra na próxima fase.</div></div></fieldset>
-<details class="config-group" open><summary>T6613 — configuração completa</summary><div class="config-grid" style="margin-top:12px">
-<label>Leitura<select id="tmode"><option value="1">ANALÓGICO</option><option value="2">UART</option><option value="3">AMBOS</option></select></label>
-<label>Analógico<select id="aif"><option value="1">ADC ESP32</option><option value="2">ADS1115</option></select></label>
+</div><div class="config-grid" style="margin-top:12px"><label>DS18B20<select id="dsMode"><option value="0">DESATIVADO</option><option value="1">1 sensor</option><option value="2">2 sensores</option><option value="3">AUTO</option></select></label></div>
+<div class="smallnote">Catálogo = conveniência. Instrumentos fora do catálogo entram por INTERFACE / DRIVER ou CONVERSOR.</div></fieldset>
+
+<details class="config-group"><summary>INTERFACE / DRIVER</summary>
+<div style="margin-top:12px">
+  <label class="checkitem"><input type="checkbox" id="s_t6613"> <b>UART — driver T6613</b></label>
+  <div class="smallnote" style="margin-top:8px">Driver T6613: UART2 do ESP32 • RX GPIO16 • TX GPIO17 • 19200 bps. Outros drivers/protocolos poderão ser acrescentados aqui.</div>
+</div>
+</details>
+
+<details class="config-group" open><summary>CONVERSOR — ADC-I²C / ADS1115</summary>
+<label class="checkitem" style="margin-top:12px"><input type="checkbox" id="s_converter"> <b>ATIVAR CONVERSOR ADS1115</b></label>
+<div class="warn" style="margin-top:10px"><b>Rev.02 HOT:</b> o motor do CONVERSOR já é parametrizável em canal, entrada e escala. Nesta revisão a saída científica ainda é CO₂/ppm para preservar o SDF e o teste de AFERIÇÃO de hoje.</div>
+<div class="config-grid" style="margin-top:12px">
+<label>Instrumento / modelo<input id="conv_model" placeholder="Ex.: Telaire T8100 (metadado)"></label>
+<label>Grandeza<select id="conv_qty" disabled><option>CO₂</option></select></label>
+<label>Unidade<select id="conv_unit" disabled><option>ppm</option></select></label>
+<label>Conversor<select id="aif"><option value="2">ADS1115</option></select></label>
+<label>Canal ADS1115<select id="adsch"><option value="0">AIN0</option><option value="1" selected>AIN1</option><option value="2">AIN2</option><option value="3">AIN3</option></select></label>
+<label>Entrada mínima (V)<input id="vin0" type="number" step="any" value="0"></label>
+<label>Entrada máxima (V)<input id="vin1" type="number" step="any" value="4"></label>
+<label>Escala mínima (ppm)<input id="sc0" type="number" step="any" value="0"></label>
+<label>Escala máxima (ppm)<input id="sc1" type="number" step="any" value="2000"></label>
 <label>Divisor<select id="divider"><option value="0">SEM DIVISOR</option><option value="1">COM DIVISOR</option></select></label>
-<label>Fator divisor<input id="divratio" type="number" step="any" value="1.212121"></label>
+<label>Fator divisor<input id="divratio" type="number" step="any" value="1"></label>
 <label>Média móvel<select id="mavg"><option value="1">ATIVA</option><option value="0">DESATIVADA</option></select></label>
 <label>Janela<input id="mwin" type="number" min="1" max="60" value="10"></label>
-<label>Warm-up<select id="warm"><option value="1">INSTANTÂNEO</option><option value="0">MÉDIA PARCIAL</option></select></label></div></details>
+<label>Warm-up<select id="warm"><option value="1">INSTANTÂNEO</option><option value="0">MÉDIA PARCIAL</option></select></label>
+<select id="tmode" style="display:none"><option value="1" selected>ANALÓGICO</option><option value="2">UART</option><option value="3">AMBOS</option></select>
+</div></details>
 <details class="config-group"><summary>Intervalos de leitura</summary><div class="config-grid" style="margin-top:12px">
 <label>DHT22 ms<input id="i_dht" value="5000"></label><label>DS18B20 ms<input id="i_ds" value="5000"></label><label>T6613 ms<input id="i_t66" value="5000"></label>
 <label>BMP180 ms<input id="i_b18" value="5000"></label><label>BME280 ms<input id="i_be2" value="5000"></label><label>BME680 ms<input id="i_be6" value="5000"></label>
@@ -86,7 +106,7 @@ details.config-group>summary{font-weight:800;color:#176b3a;cursor:pointer}
 <div><b>GPIO4</b> DHT22</div><div><b>GPIO13</b> DS18B20</div><div><b>GPIO35</b> T6613 ADC</div><div><b>GPIO16/17</b> T6613 UART</div>
 <div><b>GPIO21/22</b> I²C compartilhado</div><div><b>GPIO18/5/19</b> MAX6675</div><div><b>0x48</b> ADS1115</div><div><b>0x23</b> BH1750</div><div><b>0x39</b> APDS9960</div></div>
 <div id="pinWarnings" class="warn">Mapa ativo. Conflitos de GPIO dos genéricos serão sinalizados.</div></details>
-<details class="config-group"><summary>2 sensores genéricos / industriais</summary><p class="smallnote">Quando o slot está DESATIVADO, o Installer confirma somente o estado OFF. Metadados antigos/defaults na NVS não geram falso erro.</p><div id="genericSlots"></div></details>
+<details class="config-group" style="display:none"><summary>Compatibilidade interna — slots genéricos</summary><p class="smallnote">Quando o slot está DESATIVADO, o Installer confirma somente o estado OFF. Metadados antigos/defaults na NVS não geram falso erro.</p><div id="genericSlots"></div></details>
 <details class="config-group"><summary>Correção metrológica — y = a × x + b</summary><p class="smallnote">2 correções metrológicas disponíveis. Escolha o sensor/canal habilitado e depois a grandeza. Vale para sensores nativos e genéricos. Linhas OFF e vazias são ignoradas.</p><div id="correctionSlots"></div></details>
 <div class="actions"><button id="save">GUARDAR CONFIGURAÇÃO</button><button id="newConfig" type="button">NOVA CONFIGURAÇÃO / LIMPAR CAMPOS</button></div><div id="saved" class="status">Preencha e guarde a configuração antes da instalação.</div>
 </section>
@@ -95,8 +115,8 @@ details.config-group>summary{font-weight:800;color:#176b3a;cursor:pointer}
 <div class="step">ETAPA 2 — INSTALAÇÃO</div><h2>Instale o SENS</h2>
 <p class="note">O Wi‑Fi automático do ESP Web Tools está desativado nesta versão. Terminada a instalação, use a Etapa 3: ela grava automaticamente o Nome + Serial já salvos e, na mesma conexão USB, segue para a rede.</p>
 <div class="actions">
-<esp-web-install-button manifest="manifest-v21057-do-zero.json"><button slot="activate">INSTALAR SENS DO ZERO</button></esp-web-install-button>
-<esp-web-install-button manifest="manifest-v21057-preservar.json"><button slot="activate">ATUALIZAR — PRESERVAR DADOS</button></esp-web-install-button>
+<esp-web-install-button manifest="manifest-next-t8100-do-zero.json"><button slot="activate">INSTALAR SENS DO ZERO</button></esp-web-install-button>
+<esp-web-install-button manifest="manifest-next-t8100-preservar.json"><button slot="activate">ATUALIZAR — PRESERVAR DADOS</button></esp-web-install-button>
 <div style="margin-top:8px;font-size:.88rem;line-height:1.35">
   <strong>ATUALIZAR — PRESERVAR DADOS:</strong> mantém NVS/identidade do equipamento
   (Epoch, próximo Seq e configurações). Se o gravador apresentar uma opção de apagar
@@ -270,7 +290,7 @@ function appendMonitor(text){
 
 
 function getSaved(){
-  try{return JSON.parse(localStorage.getItem("sensInstallerV21059")||"null")}catch(e){return null}
+  try{return JSON.parse(localStorage.getItem("sensInstallerNEXTCONVERSORREV02")||"null")}catch(e){return null}
 }
 function setStatus(id,text,kind=""){
   const e=$(id);e.textContent=text;e.className="status "+kind;
@@ -320,7 +340,10 @@ function enabledCorrectionSensors(){
   add($("s_bmp180").checked,"S_BMP180"); add($("s_bme280").checked,"S_BME280");
   add($("s_bme680").checked,"S_BME680"); add($("s_bmp388").checked,"S_BMP388");
   add($("s_bh1750").checked,"S_BH1750"); add($("s_apds").checked,"S_APDS9960");
-  add($("s_thermok").checked,"S_THK"); add($("s_t6613").checked,"S_CO2"); add($("s_gps").checked,"S_GPS");
+  add($("s_thermok").checked,"S_THK");
+  if($("s_converter")?.checked)a.push({id:"S_CO2",label:`CONVERSOR ADS1115${$("conv_model")?.value.trim()?" — "+$("conv_model").value.trim():""}`,quantities:["co2"]});
+  else add($("s_t6613").checked,"S_CO2");
+  add($("s_gps").checked,"S_GPS");
   for(let i=0;i<2;i++){
     if($("g"+i+"_en")?.value==="1"){
       const id=$("g"+i+"_id")?.value.trim(), qty=$("g"+i+"_qty")?.value.trim();
@@ -353,7 +376,7 @@ function refreshCorrectionQuantities(i,preferred=""){
   updateCorrectionPreview(i);
 }
 function wireCorrectionMenus(){
-  const ids=["s_dht22","s_t6613","s_bmp180","s_bme280","s_bme680","s_bmp388","s_bh1750","s_apds","s_thermok","s_gps","dsMode"];
+  const ids=["s_dht22","s_t6613","s_converter","s_bmp180","s_bme280","s_bme680","s_bmp388","s_bh1750","s_apds","s_thermok","s_gps","dsMode"];
   for(const id of ids)$(id)?.addEventListener("change",refreshCorrectionMenus);
   for(let i=0;i<2;i++){
     $("c"+i+"_sid")?.addEventListener("change",()=>refreshCorrectionQuantities(i));
@@ -363,9 +386,35 @@ function wireCorrectionMenus(){
   refreshCorrectionMenus();
 }
 
-function advForm(){return `tmode=${$("tmode").value};aif=${$("aif").value};div=${$("divider").value};divr=${$("divratio").value};mavg=${$("mavg").value};mwin=${$("mwin").value};warm=${$("warm").value};i_dht=${$("i_dht").value};i_ds=${$("i_ds").value};i_t66=${$("i_t66").value};i_b18=${$("i_b18").value};i_be2=${$("i_be2").value};i_be6=${$("i_be6").value};i_b38=${$("i_b38").value};i_bh=${$("i_bh").value};i_ap=${$("i_ap").value};i_th=${$("i_th").value};i_gps=${$("i_gps").value}`}
+function applyConverterProfile(){
+  const on=$("s_converter")?.checked;
+  if(!on)return;
+  $("s_t6613").checked=false; // Rev.02 usa o mesmo canal CO2 interno; evita duas fontes simultâneas
+  $("tmode").value="1";
+  $("aif").value="2";
+  $("divider").value=$("divider").value||"0";
+  refreshCorrectionMenus();
+}
+$("s_converter")?.addEventListener("change",applyConverterProfile);
+$("s_t6613")?.addEventListener("change",()=>{if($("s_t6613").checked && $("s_converter")?.checked){$("s_converter").checked=false;refreshCorrectionMenus();}});
+$("conv_model")?.addEventListener("input",refreshCorrectionMenus);
+
+function advForm(){const tmode=$("s_t6613")?.checked?2:1;return `tmode=${tmode};aif=${$("aif").value};adsch=${$("adsch").value};vin0=${$("vin0").value};vin1=${$("vin1").value};sc0=${$("sc0").value};sc1=${$("sc1").value};div=${$("divider").value};divr=${$("divratio").value};mavg=${$("mavg").value};mwin=${$("mwin").value};warm=${$("warm").value};i_dht=${$("i_dht").value};i_ds=${$("i_ds").value};i_t66=${$("i_t66").value};i_b18=${$("i_b18").value};i_be2=${$("i_be2").value};i_be6=${$("i_be6").value};i_b38=${$("i_b38").value};i_bh=${$("i_bh").value};i_ap=${$("i_ap").value};i_th=${$("i_th").value};i_gps=${$("i_gps").value}`}
 function genForm(i){return `en=${$("g"+i+"_en").value};id=${$("g"+i+"_id").value};model=${$("g"+i+"_model").value};mfr=${$("g"+i+"_mfr").value};if=${$("g"+i+"_if").value};qty=${$("g"+i+"_qty").value};unit=${$("g"+i+"_unit").value};gpio=${$("g"+i+"_gpio").value};in0=${$("g"+i+"_in0").value};in1=${$("g"+i+"_in1").value};sc0=${$("g"+i+"_sc0").value};sc1=${$("g"+i+"_sc1").value};baud=${$("g"+i+"_baud").value};slave=${$("g"+i+"_slave").value};reg=${$("g"+i+"_reg").value};factor=${$("g"+i+"_factor").value};ppu=${$("g"+i+"_ppu").value};pwin=${$("g"+i+"_pwin").value};total=${$("g"+i+"_total").value}`}
-function corForm(i){return `en=${$("c"+i+"_en").value};sid=${$("c"+i+"_sid").value};qty=${$("c"+i+"_qty").value};a=${$("c"+i+"_a").value};b=${$("c"+i+"_b").value};cid=${$("c"+i+"_cid").value};ver=${$("c"+i+"_ver").value}`}
+function sensDecimal(v,label){
+  const raw=String(v??"").trim();
+  const normalized=raw.replace(/\s+/g,"").replace(",",".");
+  if(!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(normalized))
+    throw new Error(`${label}: valor numérico inválido "${raw}". Use, por exemplo, -135,33249 ou -135.33249.`);
+  const n=Number(normalized);
+  if(!Number.isFinite(n)) throw new Error(`${label}: valor numérico inválido "${raw}".`);
+  return String(n);
+}
+function corForm(i){
+  const a=sensDecimal($("c"+i+"_a").value,`Correção ${i+1} — Ganho (a)`);
+  const b=sensDecimal($("c"+i+"_b").value,`Correção ${i+1} — Offset (b)`);
+  return `en=${$("c"+i+"_en").value};sid=${$("c"+i+"_sid").value};qty=${$("c"+i+"_qty").value};a=${a};b=${b};cid=${$("c"+i+"_cid").value};ver=${$("c"+i+"_ver").value}`
+}
 function updateCorrectionPreview(i){
   const en=$("c"+i+"_en")?.value==="1", q=$("c"+i+"_qty")?.value.trim()||"y", a=$("c"+i+"_a")?.value||"1", b=$("c"+i+"_b")?.value||"0";
   const e=$("c"+i+"_eq"); if(e)e.textContent=`${en?"CORREÇÃO ATIVA":"CORREÇÃO DESATIVADA"} — ${q} corrigida = ${a} × valor medido ${Number(b)>=0?"+ ":"− "}${Math.abs(Number(b)||0)}`;
@@ -387,26 +436,27 @@ function restoreFull(c){
   if(!c)return;
   const V=(id,v)=>{if($(id))$(id).value=(v??"")};
   V("name",c.name||"");V("serial",c.serial||"");V("project",c.project||"");V("location",c.location||"");V("platformUrl",c.platformUrl||"");V("role",c.role||"NORMAL");V("sendSec",c.sendSec||60);$("syncPlatform").checked=c.sync!==false;
-  const z=c.sensors||{};for(const [id,k] of [["s_dht22","dht22"],["s_t6613","t6613"],["s_bmp180","bmp180"],["s_bme280","bme280"],["s_bme680","bme680"],["s_bmp388","bmp388"],["s_bh1750","bh1750"],["s_apds","apds"],["s_thermok","thermok"],["s_gps","gps"]])$(id).checked=!!z[k];V("dsMode",z.dsMode||0);
-  const a=kvObj(c.advanced||"");for(const [k,id] of Object.entries({tmode:"tmode",aif:"aif",div:"divider",divr:"divratio",mavg:"mavg",mwin:"mwin",warm:"warm",i_dht:"i_dht",i_ds:"i_ds",i_t66:"i_t66",i_b18:"i_b18",i_be2:"i_be2",i_be6:"i_be6",i_b38:"i_b38",i_bh:"i_bh",i_ap:"i_ap",i_th:"i_th",i_gps:"i_gps"}))if(k in a)V(id,a[k]);
+  const z=c.sensors||{};if(z.t8100 && z.converter===undefined){z.converter=true;z.convModel=z.convModel||"Telaire T8100";}for(const [id,k] of [["s_dht22","dht22"],["s_t6613","t6613"],["s_converter","converter"],["s_bmp180","bmp180"],["s_bme280","bme280"],["s_bme680","bme680"],["s_bmp388","bmp388"],["s_bh1750","bh1750"],["s_apds","apds"],["s_thermok","thermok"],["s_gps","gps"]])$(id).checked=!!z[k];V("dsMode",z.dsMode||0);V("conv_model",z.convModel||"");
+  const a=kvObj(c.advanced||"");for(const [k,id] of Object.entries({tmode:"tmode",aif:"aif",adsch:"adsch",vin0:"vin0",vin1:"vin1",sc0:"sc0",sc1:"sc1",div:"divider",divr:"divratio",mavg:"mavg",mwin:"mwin",warm:"warm",i_dht:"i_dht",i_ds:"i_ds",i_t66:"i_t66",i_b18:"i_b18",i_be2:"i_be2",i_be6:"i_be6",i_b38:"i_b38",i_bh:"i_bh",i_ap:"i_ap",i_th:"i_th",i_gps:"i_gps"}))if(k in a)V(id,a[k]);
   for(let i=0;i<2;i++){const g=kvObj(c.generics?.[i]||"");for(const k of ["en","id","model","mfr","if","gpio","qty","unit","in0","in1","sc0","sc1","baud","slave","reg","factor","ppu","pwin","total"])if(k in g)V(`g${i}_${k}`,g[k]);const q=kvObj(c.corrections?.[i]||"");for(const k of ["sid","qty","a","b","cid","en","ver"])if(k in q)V(`c${i}_${k}`,q[k]);updateCorrectionPreview(i);}
   refreshCorrectionMenus();
 }
-function clearNewConfig(){localStorage.removeItem("sensInstallerV21059");location.reload();}
+function clearNewConfig(){localStorage.removeItem("sensInstallerNEXTCONVERSORREV02");location.reload();}
 function fmtKv(x,kind){const o=kvObj(x||"");if(kind==="generic")return String(o.en)!=="1"?"DESATIVADO":`${o.id||"—"} • ${o.model||"—"} • ${o.qty||"—"} ${o.unit||""} • GPIO ${o.gpio||"—"} • fator ${o.factor||"—"}`;if(kind==="corr")return String(o.en)!=="1"?"DESATIVADA":`${o.sid||"—"} • ${o.qty||"—"} • y = ${o.a||1} × x + ${o.b||0} • Aferição ${o.cid||"—"}`;return Object.entries(o).map(([k,v])=>`${k}=${v}`).join(" • ")||"—";}
 function saveConfig(){
+  applyConverterProfile();
   const name=$("name").value.trim(),serial=$("serial").value.trim();
   if(!name||!serial){alert("Preencha Nome e Serial.");return false;}
   if(!validSerial(serial)){alert("No Serial use apenas letras, números e hífen.");return false;}
   const c={name,serial,project:$("project").value.trim(),location:$("location").value.trim(),platformUrl:$("platformUrl").value.trim(),
     role:$("role").value,sendSec:parseInt($("sendSec").value,10),sync:$("syncPlatform").checked,
-    sensors:{dht22:$("s_dht22").checked,t6613:$("s_t6613").checked,bmp180:$("s_bmp180").checked,
+    sensors:{dht22:$("s_dht22").checked,t6613:$("s_t6613").checked,converter:$("s_converter").checked,convModel:$("conv_model").value.trim(),bmp180:$("s_bmp180").checked,
     bme280:$("s_bme280").checked,bme680:$("s_bme680").checked,bmp388:$("s_bmp388").checked,
     bh1750:$("s_bh1750").checked,apds:$("s_apds").checked,thermok:$("s_thermok").checked,
     gps:$("s_gps").checked,dsMode:parseInt($("dsMode").value,10)}};
   c.advanced=advForm();c.generics=Array.from({length:2},(_,i)=>genForm(i));c.corrections=Array.from({length:2},(_,i)=>corForm(i));
   if(!/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec(?:[?#].*)?$/.test(c.platformUrl)){setStatus("saved","Informe uma URL válida da implantação Web App da SENS Platform (https://script.google.com/macros/s/.../exec).","err");return;}
-  localStorage.setItem("sensInstallerV21059",JSON.stringify(c));
+  localStorage.setItem("sensInstallerNEXTCONVERSORREV02",JSON.stringify(c));
   setStatus("saved",`Configuração guardada.\nNome: ${name}\nSerial: ${serial}\nPapel: ${c.role}\nIntervalo: ${c.sendSec}s`,"ok");
   return true;
 }
@@ -503,9 +553,9 @@ async function reopenImprovSamePort(attempt,total){
   await new Promise(r=>setTimeout(r,4200));
 }
 
-function encodeRuntime(c){const s=c.sensors||{},ds=s.dsMode||0;return [`project=${c.project||""}`,`location=${c.location||""}`,`role=${c.role||"NORMAL"}`,`url=${c.platformUrl||""}`,`send=${c.sendSec||60}`,`sync=${c.sync?1:0}`,`dht22=${s.dht22?1:0}`,`ds18=${ds>0?1:0}`,`dsMode=${ds}`,`bmp180=${s.bmp180?1:0}`,`bme280=${s.bme280?1:0}`,`bme680=${s.bme680?1:0}`,`bmp388=${s.bmp388?1:0}`,`bh1750=${s.bh1750?1:0}`,`apds=${s.apds?1:0}`,`thermok=${s.thermok?1:0}`,`t6613=${s.t6613?1:0}`,`gps=${s.gps?1:0}`].join(";");}
+function encodeRuntime(c){const s=c.sensors||{},ds=s.dsMode||0;return [`project=${c.project||""}`,`location=${c.location||""}`,`role=${c.role||"NORMAL"}`,`url=${c.platformUrl||""}`,`send=${c.sendSec||60}`,`sync=${c.sync?1:0}`,`dht22=${s.dht22?1:0}`,`ds18=${ds>0?1:0}`,`dsMode=${ds}`,`bmp180=${s.bmp180?1:0}`,`bme280=${s.bme280?1:0}`,`bme680=${s.bme680?1:0}`,`bmp388=${s.bmp388?1:0}`,`bh1750=${s.bh1750?1:0}`,`apds=${s.apds?1:0}`,`thermok=${s.thermok?1:0}`,`t6613=${(s.t6613||s.converter)?1:0}`,`gps=${s.gps?1:0}`].join(";");}
 function parseRuntime(x){const o={};for(const p of (x||"").split(";")){const i=p.indexOf("=");if(i>=0)o[p.slice(0,i)]=p.slice(i+1)}return o}
-function showRuntime(x,name,serial){const r=parseRuntime(x);$("cfgName").textContent=name;$("cfgSerial").textContent=serial;$("cfgProject").textContent=r.project||"—";$("cfgLocation").textContent=r.location||"—";$("cfgPlatformUrl").textContent=r.url||"—";$("cfgRole").textContent=r.role||"—";$("cfgSend").textContent=(r.send||"—")+" s";$("cfgSync").textContent=r.sync==="1"?"SIM":"NÃO";const n=[];if(r.dht22==="1")n.push("DHT22");if(r.t6613==="1")n.push("T6613");if(r.ds18==="1")n.push(`DS18B20(modo ${r.dsMode||"0"})`);for(const [k,l] of [["bmp180","BMP180"],["bme280","BME280"],["bme680","BME680"],["bmp388","BMP388"],["bh1750","BH1750"],["apds","APDS9960"],["thermok","Termopar K"],["gps","GPS"]])if(r[k]==="1")n.push(l);$("cfgSensors").textContent=n.length?n.join(" • "):"Nenhum sensor habilitado";}
+function showRuntime(x,name,serial){const r=parseRuntime(x);$("cfgName").textContent=name;$("cfgSerial").textContent=serial;$("cfgProject").textContent=r.project||"—";$("cfgLocation").textContent=r.location||"—";$("cfgPlatformUrl").textContent=r.url||"—";$("cfgRole").textContent=r.role||"—";$("cfgSend").textContent=(r.send||"—")+" s";$("cfgSync").textContent=r.sync==="1"?"SIM":"NÃO";const n=[];if(r.dht22==="1")n.push("DHT22");if(r.t6613==="1"){const sv=getSaved()?.sensors||{};n.push(sv.converter?`CONVERSOR ADS1115${sv.convModel?" — "+sv.convModel:""}`:"T6613 UART");}if(r.ds18==="1")n.push(`DS18B20(modo ${r.dsMode||"0"})`);for(const [k,l] of [["bmp180","BMP180"],["bme280","BME280"],["bme680","BME680"],["bmp388","BMP388"],["bh1750","BH1750"],["apds","APDS9960"],["thermok","Termopar K"],["gps","GPS"]])if(r[k]==="1")n.push(l);$("cfgSensors").textContent=n.length?n.join(" • "):"Nenhum sensor habilitado";}
 
 async function confirmIdentityFast(label,wanted,setter,getter,onProgress){
   let last="";

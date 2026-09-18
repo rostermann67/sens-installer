@@ -1,0 +1,18 @@
+{
+  "name": "SENS NEXT — CONVERSOR ADC-I²C Rev.02 — Instalação do Zero",
+  "version": "NEXT-CONVERSOR Rev.02",
+  "new_install_prompt_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        {
+          "path": "firmware/SENS_NEXT_CONVERSOR_REV02_MERGED.bin",
+          "offset": 0
+        }
+      ],
+      "improv": false
+    }
+  ],
+  "new_install_improv_wait_time": 0
+}

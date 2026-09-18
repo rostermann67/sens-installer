@@ -1,0 +1,30 @@
+{
+  "name": "SENS NEXT — CONVERSOR ADC-I²C Rev.02",
+  "version": "NEXT-CONVERSOR Rev.02",
+  "new_install_prompt_erase": true,
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        {
+          "path": "firmware/SENS_NEXT_CONVERSOR_REV02_BOOTLOADER.bin",
+          "offset": 4096
+        },
+        {
+          "path": "firmware/SENS_NEXT_CONVERSOR_REV02_PARTITIONS.bin",
+          "offset": 32768
+        },
+        {
+          "path": "firmware/SENS_NEXT_CONVERSOR_REV02_BOOT_APP0.bin",
+          "offset": 57344
+        },
+        {
+          "path": "firmware/SENS_NEXT_CONVERSOR_REV02_APP.bin",
+          "offset": 65536
+        }
+      ],
+      "improv": true
+    }
+  ],
+  "new_install_improv_wait_time": 0
+}
