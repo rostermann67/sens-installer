@@ -1,0 +1,7 @@
+{
+  "name": "SENS NEXT — UNIVERSAL Rev.03D — Correção Genérica — Instalação do Zero",
+  "version": "NEXT-UNIVERSAL Rev.03D",
+  "new_install_prompt_erase": false,
+  "builds": [{"chipFamily":"ESP32","parts":[{"path":"firmware/SENS_NEXT_UNIVERSAL_REV03D_MERGED.bin","offset":0}],"improv":false}],
+  "new_install_improv_wait_time": 0
+}
