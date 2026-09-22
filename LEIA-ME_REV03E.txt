@@ -1,0 +1,6 @@
+SENS INSTALLER NEXT — UNIVERSAL Rev.03E
+
+Gerado a partir do Installer Rev.03B, preservando a interface/configuração e substituindo a imagem de firmware pela compilação Rev.03E recebida em 22/09/2026.
+
+DO ZERO: grava o merged.bin em 0x0000.
+PRESERVAR DADOS: grava bootloader 0x1000, partitions 0x8000, boot_app0 0xE000 e app 0x10000, preservando a NVS conforme a arquitetura do Installer anterior.
